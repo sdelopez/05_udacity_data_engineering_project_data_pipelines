@@ -18,4 +18,4 @@ We have provided you with a project template that takes care of all the imports 
 
 You'll be provided with a helpers class that contains all the SQL transformations. Thus, you won't need to write the ETL yourselves, but you'll need to execute it with your custom operators.
 
-![Exemple DAG](img/example-dag.png)
+![Exemple DAG](img/example-dag.png "DAG - ETL steps")
