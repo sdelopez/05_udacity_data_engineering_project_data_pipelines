@@ -6,29 +6,28 @@ services:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
-        logging:
-            options:
-                max-size: 10m
-                max-file: "3"
-
+        # logging:
+        #     options:
+        #         max-size: 10m
+        #         max-file: "3"
+        volumes:
+            - pgdata:/var/lib/postgresql/data
     webserver:
-        image: puckel/docker-airflow:1.10.9
+        image: puckel/docker-airflow:1.10.2
         restart: always
         depends_on:
             - postgres
         environment:
             - LOAD_EX=n
             - EXECUTOR=Local
-        logging:
-            options:
-                max-size: 10m
-                max-file: "3"
+        # logging:
+        #     options:
+        #         max-size: 10m
+        #         max-file: "3"
         volumes:
-            - /c/Users/sdelo/SynologyDrive/data_science/mooc/udacity/01_data_engineering/04_data_pipelines/05_project_data_pipelines/requirements.txt:/requirements.txt
-            # - /c/Users/sdelo/SynologyDrive/data_science/mooc/udacity/01_data_engineering/04_data_pipelines/05_project_data_pipelines/workspace/lesson1/airflow/dags:/usr/local/airflow/dags
-            # - /c/Users/sdelo/SynologyDrive/data_science/mooc/udacity/01_data_engineering/04_data_pipelines/05_project_data_pipelines/workspace/lesson3/airflow/plugins:/usr/local/airflow/plugins
-            - /c/Users/sdelo/SynologyDrive/data_science/mooc/udacity/01_data_engineering/04_data_pipelines/05_project_data_pipelines/dags:/usr/local/airflow/dags
-            - /c/Users/sdelo/SynologyDrive/data_science/mooc/udacity/01_data_engineering/04_data_pipelines/05_project_data_pipelines/plugins:/usr/local/airflow/plugins
+            - /absolute_path_to_project_folder/requirements.txt:/requirements.txt
+            - /absolute_path_to_project_folder/dags:/usr/local/airflow/dags
+            - /absolute_path_to_project_folder/plugins:/usr/local/airflow/plugins
         ports:
             - "8080:8080"
         command: webserver
@@ -37,3 +36,5 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
+volumes:
+    pgdata:
