@@ -24,6 +24,7 @@ class DataQualityOperator(BaseOperator):
         redshift = PostgresHook(postgres_conn_id = self.redshift_conn_id)
 
         # Pass a list of table to check
+        # loop over table to count the number of records in each table
         for table in self.tables:
             self.log.info(f'Starting data quality check for {table} in Redshift')
 

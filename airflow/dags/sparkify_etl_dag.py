@@ -1,27 +1,35 @@
 from datetime import datetime, timedelta
 import os
 from airflow import DAG
+from airflow.models import Variable
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from operators import (StageToRedshiftOperator, LoadFactOperator,
                                 LoadDimensionOperator, DataQualityOperator)
 from helpers import SqlQueries
 
-# AWS_KEY = os.environ.get('AWS_KEY')
-# AWS_SECRET = os.environ.get('AWS_SECRET')
+# get S3 bucket path  from Airflow variables
+# S3 bucket path can be set/modified in Airflow variables
 
+s3_bucket = Variable.get('s3_bucket')
+s3_prefix_log = Variable.get('s3_prefix_log')
+s3_prefix_song = Variable.get('s3_prefix_song')
+
+# define defautl argument for DAG
 default_args = {
-    'owner': 'udacity',
+    'owner': 'sdelopez',
     'start_date': datetime(2019, 1, 12),
     'depends_on_past': False,
     'retries': 3,
     'retry_delay': 300,
 }
 
+
 dag = DAG('02_sparkify_etl_dag',
           default_args=default_args,
           description='Extract from S3, Transform and Load data in Redshift with Airflow pipeline',
-          schedule_interval='@hourly'
+          schedule_interval='@hourly',
+          catchup=False
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
@@ -30,8 +38,8 @@ start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
     dag=dag,
-    s3_bucket='udacity-dend',
-    s3_prefix='log_data',
+    s3_bucket=s3_bucket,
+    s3_prefix=s3_prefix_log,
     table='staging_events',
     copy_options="JSON 's3://udacity-dend/log_json_path.json'"
 )
@@ -39,8 +47,8 @@ stage_events_to_redshift = StageToRedshiftOperator(
 stage_songs_to_redshift = StageToRedshiftOperator(
     task_id='Stage_songs',
     dag=dag,
-    s3_bucket='udacity-dend',
-    s3_prefix='song_data',
+    s3_bucket=s3_bucket,
+    s3_prefix=s3_prefix_song,
     table='staging_songs',
     copy_options="FORMAT AS JSON 'auto'"
 )
@@ -88,7 +96,7 @@ load_time_dimension_table = LoadDimensionOperator(
 run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
     dag=dag,
-    tables=['songplays', 'songs', 'artists', 'users', 'times'],
+    tables=['songplays', 'songs', 'artists', 'users', 'time'],
     redshift_conn_id='redshift',
 )
 

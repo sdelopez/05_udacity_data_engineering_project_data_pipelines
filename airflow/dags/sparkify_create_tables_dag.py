@@ -12,14 +12,20 @@ from helpers import SqlQueries
 # AWS_SECRET = os.environ.get('AWS_SECRET')
 
 default_args = {
-    'owner': 'udacity',
+    'owner': 'sdelopez',
     'start_date': datetime(2019, 1, 12),
+    'depends_on_past': False,
+    'retries': 3,
+    'retry_delay': 300,
+    'email_on_retry': False
 }
 
+# run only once the dag to create table
 dag = DAG('01_sparkify_create_tables_dag',
           default_args=default_args,
           description='Create staging, Fact, Dimension tables in Redshift with Airflow',
-          schedule_interval='0 * * * *'
+          schedule_interval='@once',
+          catchup=False
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
