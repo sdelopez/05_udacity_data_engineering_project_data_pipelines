@@ -126,7 +126,7 @@ Before running the DAG, several credentials and variables must be set in Airflow
 - S3 path info must be set in Airflow Admin/Variables UI
     - s3_bucket : udacity-dend
     - s3_prefix_log : log_data
-    - s3_prefix_song : songs_data
+    - s3_prefix_song : song_data
 
 Airflow DAG run can be monitored through various tools from Airflow UI. One the these tools is the GANTT chart to view the task duration/orchestration timeline
 ![Sparkify ETL DAG workflow](./img/05_airflow_gantt_chart.PNG "DAG - ETL workflow")
